@@ -1,7 +1,10 @@
 local player = {}
+t = require "trail"
 
-function player:new(color)
-	color = color or {255,255,255}
+function player:new(lcolor, bcolor)
+	lcolor = lcolor or {255,255,255}
+	bcolor = bcolor or {0,0,0}
+
 	local o = {
 		["x"] = 0,
 		["y"] = 0,
@@ -9,7 +12,9 @@ function player:new(color)
 		["s"] = 500,
 		["d"] = 0,
 		["t"] = 10,
-		["color"] = {255,255,255}
+		["lcolor"] = lcolor,
+		["bcolor"] = bcolor,
+		["trail"] = t:new(0,0,100,0)
 	}
 	setmetatable(o,self)
 	self.__index = self
@@ -43,6 +48,9 @@ function player:update(dt,tmult, vmult, friction)
 	self.v.v = self.v.v*(1-friction*60*dt)
 	if math.abs(self.v.h) < .051 then self.v.h = 0 end
 	if math.abs(self.v.v) < .051 then self.v.v = 0 end
+
+	self.trail:update(dt,friction)
+
 end
 function player:draw()
 	local triangle = {
@@ -53,15 +61,18 @@ function player:draw()
 	local rectangle = {
 		w/2-7*math.sin(self.d), h/2+7*math.cos(self.d),
 		w/2+7*math.sin(self.d), h/2-7*math.cos(self.d),
-		w/2-11*math.sin(self.d), h/2+3*math.cos(self.d),
-		w/2+3*math.sin(self.d), h/2-11*math.cos(self.d)
+		w/2+7*math.sin(self.d)-4*math.cos(self.d), h/2-7*math.cos(self.d)-4*math.sin(self.d),
+		w/2-7*math.sin(self.d)-4*math.cos(self.d), h/2+7*math.cos(self.d)-4*math.sin(self.d)
 	}
-	love.graphics.setColor(0,0,0)
+	love.graphics.setColor(self.bcolor)
 	love.graphics.polygon("fill",triangle)
 	love.graphics.polygon("fill",rectangle)
 
-	love.graphics.setColor(self.color)
+	love.graphics.setColor(self.lcolor)
 	love.graphics.polygon("line", triangle)
 	love.graphics.polygon("line", rectangle)
+
+	self.trail:update(self.x,self.y)
+
 end
 return player

@@ -4,7 +4,7 @@ function background:new(w, h)
 	local o = {
 		["starDensity"] = 2.5,
 		["xSections"] = 7,
-		["ySections"] = 5,
+		["ySections"] = 7*h/w,
 		["screenW"] = w,
 		["screenH"] = h,
 		["xPrev"] = 0,
